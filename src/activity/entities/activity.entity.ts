@@ -44,15 +44,20 @@ export class Activity {
   @Column({ nullable: true })
   participants: number;
 
+  @ApiProperty({description:'number paricipants now'})
+  @Column({default:1})
+  number_pp:number
+  
+
   @ApiProperty({ description: 'Start date and time of the activity' })
-  @Column({ name: 'date_time_start', nullable: true, type: 'date' })
+  @Column({ name: 'date_time_start', nullable: true, type: 'datetime' })
   dateTimeStart: Date;
 
   @ApiProperty({ description: 'End date and time of the activity' })
   @Column({
     name: 'date_time_end',
     nullable: true,
-    type: 'date',
+    type: 'datetime',
     default: null,
   })
   dateTimeEnd: Date;

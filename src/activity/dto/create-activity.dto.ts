@@ -5,13 +5,11 @@ import {
   IsInt,
   IsDateString,
   IsString,
-  IsArray,
+  NotEquals,
 } from 'class-validator';
 import { DeepPartial } from 'typeorm';
 import { ActivityType } from '../entities/activity-type.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Match } from 'src/common/decorators/match.decorator';
-import { Asset } from 'src/asset/entities/asset.entity';
 
 export class CreateActivityDto {
   @ApiProperty({ description: 'Name of the activity', example: 'Workshop' })
@@ -33,6 +31,7 @@ export class CreateActivityDto {
   @ApiProperty({ description: 'Number of participants', example: 20 })
   @IsOptional()
   @IsInt()
+  @NotEquals(0,{message:'participants < 1'})
   participants?: number;
 
   @ApiProperty({ description: 'Start date and time of the activity' })

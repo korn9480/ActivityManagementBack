@@ -1,34 +1,40 @@
-import { Test } from '@nestjs/testing';
+// activity.controller.spec.ts
+import { Test, TestingModule } from '@nestjs/testing';
+import { ActivityController } from '../../../src/activity/activity.controller';
 import { ActivityService } from '../../../src/activity/activity.service';
-import { AssetService } from '../../../src/asset/asset.service';
-import { Repository } from 'typeorm';
 import { Activity } from 'src/activity/entities/activity.entity';
-import { CreateActivityDto } from 'src/activity/dto/create-activity.dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository, Connection } from 'typeorm';
+import { JoinActivity } from 'src/activity/entities/joinActivities.entity';
 
-describe('ActivityService', () => {
-  let activityService: ActivityService;
-  let activityRepository: Repository<Activity>;
-  // let AssetService : AssetService
+describe('ActivityController', () => {
+  let controller: ActivityController;
+
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
-      providers: [
-        ActivityService,
-        AssetService,
-        { provide: Repository, useValue: Activity },
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [ActivityController],
+      providers: [ActivityService,
+        {
+          provide:getRepositoryToken(Activity),
+          useClass:Repository
+        },
+        {
+          provide:getRepositoryToken(JoinActivity),
+          useClass:Repository
+        },
+        Connection
       ],
     }).compile();
-    activityService = moduleRef.get<ActivityService>(ActivityService);
+
+    controller = module.get<ActivityController>(ActivityController);
   });
 
-  describe('create', () => {
-    const form: CreateActivityDto = {
-      nameActivity: 'ทดสอบ',
-    };
-    it('should create a new user', async () => {
-      const createSpy = jest.spyOn(activityRepository, 'create');
-      const saveSpy = jest.spyOn(activityRepository, 'save');
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
 
-      await activityService.create();
-    });
+  it('findOpenJoin should return an array of activities', async () => {
+    const result = await controller.findOpenJoin();
+    expect(Array.isArray(result)).toBe(true);
   });
 });

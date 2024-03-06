@@ -7,11 +7,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from './role.entity'; // Import the Role entity
+import { Allergy } from 'src/allergy/entities/allergy.entity';
 
 @Entity({
   name: 'user',
@@ -82,6 +84,10 @@ export class User {
   @ManyToOne(() => Role, { eager: true, nullable: false }) // Many-to-One relationship with Role entity
   @JoinColumn({ name: 'roleId' })
   roleId: DeepPartial<Role>;
+
+  @OneToMany(()=> Allergy,a=>a.code_student)
+  // @JoinColumn({name:'allergies'})
+  allergies:Allergy[]
 
   @ApiProperty({ description: 'Created date of user' })
   @CreateDateColumn({ name: 'date_time_created' })

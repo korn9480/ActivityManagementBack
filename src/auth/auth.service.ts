@@ -21,6 +21,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { Role } from 'src/users/entities/role.entity';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { env } from 'process';
 
 @Injectable()
 export class AuthService {
@@ -62,7 +63,7 @@ export class AuthService {
 
   async update(signUpDto: UpdateAuthDto) {
     const user = await this.userRepository.findOne({
-      where: { code_student: signUpDto.code_student },
+      where: { code_student: signUpDto.code_student },relations:['allergies']
     });
     if (!user) {
       throw new ConflictException(
@@ -81,7 +82,7 @@ export class AuthService {
           .replace('นางสาว', '')
           .replace(' ', '');
       }
-      // signUpDto.password = await this.bcryptService.hash(signUpDto.password);
+      
       await this.userRepository.save(signUpDto);
     } catch (error) {
       if (error.code === MysqlErrorCode.UniqueViolation) {
@@ -103,11 +104,7 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Invalid email');
     }
-    const passwordCompare = await this.bcryptService.compare(
-      password,
-      user.password,
-    );
-    if (!passwordCompare) {
+    if (!await this.checkPassword(password,user.password)) {
       throw new BadRequestException('Invalid password');
     }
 
@@ -117,6 +114,7 @@ export class AuthService {
       profile: user.profile,
       prefix: user.prefix,
       accessToken,
+      role: user.roleId.nameRole
     };
   }
 
@@ -140,8 +138,15 @@ export class AuthService {
     await this.userRepository.save(newUser);
   }
 
+  private async checkPassword(newPassword:string,passwordOld:string){
+    return await this.bcryptService.compare(
+      newPassword,
+      passwordOld,
+    );
+  }
+
   private async generateAccessToken(user: Partial<User>): Promise<string> {
-    const tokenId = randomUUID();
+    const tokenId = process.env.TOKEN_ID
     await this.redisService.insert(`user-${user.code_student}`, tokenId);
     const accessToken = await this.jwtService.signAsync(
       {

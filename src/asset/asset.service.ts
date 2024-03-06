@@ -1,14 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
-import { CreateAssetDto } from './dto/create-asset.dto';
-import { UpdateAssetDto } from './dto/update-asset.dto';
 import { Asset, AssetType } from './entities/asset.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
-import * as fs from 'fs';
+import { FileService } from './file.service';
 
 @Injectable()
-export class AssetService {
+export class AssetService extends FileService implements OnApplicationBootstrap{
   constructor(
     @InjectRepository(Asset)
     private readonly assetRepository: Repository<Asset>,
@@ -16,7 +14,20 @@ export class AssetService {
     private readonly typeRepository: Repository<AssetType>,
     @InjectRepository(Activity)
     private readonly acRepository: Repository<Activity>,
-  ) {}
+  ) {
+    super()
+  }
+  async onApplicationBootstrap() {
+    const listData:string[] = ['poster','imgEvent']
+    const dataNow = await this.typeRepository.find()
+    if (dataNow.length==0){
+      for(let i of listData){
+        let type = this.typeRepository.create()
+        type.name_type = i
+        await this.typeRepository.save(type)
+      }
+    }
+  }
   // method call controller
   async create(
     type: AssetType,
@@ -108,16 +119,5 @@ export class AssetService {
     const asset = await this.findOne(id); // Check if the asset exists
     this.removeImageInServer(asset.path);
     await this.assetRepository.remove(asset);
-  }
-
-  async removeImageInServer(pathImg: string) {
-    try {
-      await fs.unlink(pathImg, (error) => {
-        console.log(error, '==');
-      });
-      return { status: 'ok' };
-    } catch (error) {
-      return { status: `${error.error}` };
-    }
   }
 }

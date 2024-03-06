@@ -2,23 +2,14 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
-  Inject,
   Injectable,
-  Param,
-  Put,
   SetMetadata,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Request } from 'express';
-import { Asset } from 'src/asset/entities/asset.entity';
-import jwtConfig from 'src/common/config/jwt.config';
 import { REQUEST_USER_KEY } from 'src/common/constants';
 import { ActiveUserData } from 'src/common/interfaces/active-user-data.interface';
 import { ActivityService } from 'src/activity/activity.service';
 import { Reflector } from '@nestjs/core';
+import { UserService } from '../../users/users.service';
 
 export enum Owner {
   activity = 'activity',
@@ -43,12 +34,13 @@ export class OwnerAuthGuard implements CanActivate {
       tableName,
       context.getHandler(),
     );
-    const id = request.params.id_activity;
     const user: ActiveUserData = request[REQUEST_USER_KEY];
     let data: string = '';
     if (table == Owner.asset || table == Owner.activity) {
+      const id = request.params.id_activity;
       data = (await this.activityService.findOne(id)).addBy.code_student;
     }
+    console.log(user.code_student,data)
     if (user.code_student != data) {
       throw new ForbiddenException(
         'You do not have permission to remove this entity',

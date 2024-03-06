@@ -49,8 +49,9 @@ export class AllergyService {
     return await this.allergyRepository.save(allergyToUpdate);
   }
 
-  async findAll(): Promise<Allergy[]> {
-    return await this.allergyRepository.find();
+  async findAll(code_student:string): Promise<Allergy[]> {
+    return await this.allergyRepository.createQueryBuilder('al').leftJoinAndSelect('al.code_student','user')
+    .where(`al.code_student = ${code_student}`).getRawMany()
   }
 
   async findOne(id: number): Promise<Allergy> {

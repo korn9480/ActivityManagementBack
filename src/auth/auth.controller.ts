@@ -52,9 +52,8 @@ export class AuthController {
   @Post('sign-up')
   async signUp(@Body() signUpDto: SignUpDto): Promise<void> {
     await this.authService.signUp(signUpDto);
-    console.log(signUpDto);
-    if (signUpDto.allergics.length > 0) {
-      for (const at of signUpDto.allergics) {
+    if (signUpDto.allergies.length > 0) {
+      for (const at of signUpDto.allergies) {
         await this.allergyService.create(at);
       }
     }
@@ -69,13 +68,17 @@ export class AuthController {
   @ApiCreatedResponse({
     description: 'User has been successfully update user',
   })
-  @OwnerTable(Owner.asset)
-  @UseGuards(OwnerAuthGuard)
+  // @OwnerTable(Owner.asset)
+  // @UseGuards(OwnerAuthGuard)
   @Put()
   async updateUser(@Body() signUpDto: UpdateAuthDto): Promise<void> {
+    const user = await this.allergyService.findAll(signUpDto.code_student)
+    for(let a of user){
+      await this.allergyService.remove(a.id)
+    }
     await this.authService.update(signUpDto);
-    if (signUpDto.allergics.length > 0) {
-      for (const at of signUpDto.allergics) {
+    if (signUpDto.allergies.length > 0) {
+      for (const at of signUpDto.allergies) {
         await this.allergyService.create(at);
       }
     }
@@ -88,8 +91,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post('sign-in')
-  signIn(@Body() signInDto: SignInDto) {
-    return this.authService.signIn(signInDto);
+  async signIn(@Body() signInDto: SignInDto) {
+    return await this.authService.signIn(signInDto);
   }
 
   @HttpCode(HttpStatus.OK)

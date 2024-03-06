@@ -108,7 +108,7 @@ export class SignUpDto {
 
   @ApiProperty({ description: 'Name of allergy', example: '' })
   @IsArray()
-  allergics: CreateAllergyDto[];
+  allergies: CreateAllergyDto[];
 
   @ApiProperty({ description: 'Role ID of the user', example: 1 })
   @IsNotEmpty()

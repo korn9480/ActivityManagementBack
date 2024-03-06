@@ -22,7 +22,7 @@ export class AllergyController {
 
   @Get()
   findAll() {
-    return this.allergyService.findAll();
+    // return this.allergyService.findAll();
   }
 
   @Get(':id')

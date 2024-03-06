@@ -7,10 +7,11 @@ import { Activity } from 'src/activity/entities/activity.entity';
 import { ActivityService } from 'src/activity/activity.service';
 import { OwnerAuthGuard } from 'src/auth/guards/owner-auth.guard';
 import { JoinActivity } from 'src/activity/entities/joinActivities.entity';
+import { ActivityType } from 'src/activity/entities/activity-type.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Asset, AssetType, Activity, JoinActivity]),
+    TypeOrmModule.forFeature([Asset, AssetType, Activity, JoinActivity,ActivityType]),
   ],
   controllers: [AssetController],
   providers: [AssetService, ActivityService, OwnerAuthGuard],

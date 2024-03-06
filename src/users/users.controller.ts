@@ -27,6 +27,7 @@ import {
   OwnerAuthGuard,
   OwnerTable,
 } from 'src/auth/guards/owner-auth.guard';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -41,8 +42,8 @@ export class UsersController {
     return this.usersService.findOne(userId);
   }
 
-  @OwnerTable(Owner.asset)
-  @UseGuards(OwnerAuthGuard)
+  // @OwnerTable(Owner.user)
+  // @UseGuards(OwnerAuthGuard)
   @Post('profile/:code_student')
   @UseInterceptors(
     FileInterceptor('profile', {
@@ -68,8 +69,10 @@ export class UsersController {
     path = path.replace('\\', '/');
     path = path.replace('\\', '/');
     await this.usersService.uploadFile(path, codeStudent);
+    return path
   }
 
+  @Public()
   @Get('profile/:code_student')
   async getProfile(@Param('code_student') code_student: string) {
     return await this.usersService.findOne(code_student);

@@ -1,16 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 // import { CreateUserDto } from './ /dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role } from './entities/role.entity';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Role) 
+    private readonly roleReposiory: Repository<Role>
   ) {}
+  async onApplicationBootstrap() {
+    const listData:string[] = ['user','admin']
+    const dataNow = await this.roleReposiory.find()
+    if (dataNow.length==0){
+      for(let i of listData){
+        let type = this.roleReposiory.create()
+        type.nameRole = i
+        await this.roleReposiory.save(type)
+      }
+    }
+  }
   async uploadFile(path: string, codeStudent: string): Promise<void> {
     const user = new User();
     user.code_student = codeStudent;
@@ -60,6 +74,7 @@ export class UserService {
       where: {
         code_student: codeStudent,
       },
+      relations:['allergies']
     });
     if (!user) {
       throw new NotFoundException(

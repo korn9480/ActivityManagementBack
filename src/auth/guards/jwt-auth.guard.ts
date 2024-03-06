@@ -51,7 +51,6 @@ export class JwtAuthGuard implements CanActivate {
       if (!isValidToken) {
         throw new UnauthorizedException('Authorization token is not valid');
       }
-
       request[REQUEST_USER_KEY] = payload;
     } catch (error) {
       throw new UnauthorizedException(error.message);
@@ -61,7 +60,6 @@ export class JwtAuthGuard implements CanActivate {
 
   private getToken(request: Request) {
     const [_, token] = request.headers.authorization?.split(' ') ?? [];
-
     return token;
   }
 }

@@ -12,6 +12,7 @@ import { CreateAllergyDto } from 'src/allergy/dto/create-allergy.dto';
 import { Match } from 'src/common/decorators/match.decorator';
 import { Role } from 'src/users/entities/role.entity';
 import { DeepPartial } from 'typeorm';
+import { SignUpDto } from './sign-up.dto';
 
 const text_error = 'format is incorrect';
 export class UpdateAuthDto {
@@ -96,7 +97,7 @@ export class UpdateAuthDto {
 
   @ApiProperty({ description: 'Name of allergy', example: '' })
   @IsArray()
-  allergics: CreateAllergyDto[];
+  allergies: CreateAllergyDto[];
 
   //   @ApiProperty({ description: 'Role ID of the user', example: 1 })
   //   @IsNotEmpty()

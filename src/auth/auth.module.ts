@@ -17,11 +17,12 @@ import { Asset, AssetType } from 'src/asset/entities/asset.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
 import { ActivityService } from 'src/activity/activity.service';
 import { JoinActivity } from 'src/activity/entities/joinActivities.entity';
+import { ActivityType } from 'src/activity/entities/activity-type.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role, Allergy, Activity, JoinActivity]),
-    JwtModule.registerAsync(jwtConfig.asProvider()),
+    TypeOrmModule.forFeature([User, Role, Allergy, Activity, JoinActivity,ActivityType]),
+    JwtModule.registerAsync(jwtConfig.asProvider())
   ],
   controllers: [AuthController],
   providers: [
